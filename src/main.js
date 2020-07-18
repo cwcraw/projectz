@@ -16,6 +16,7 @@ const store = new Vuex.Store({
     listList: ["cats", "cute cats", "very cute cats"],
     bookmarkList: [
       {
+        id: 0,
         smallURL:
           "https://images.unsplash.com/photo-1591369631806-e6473e109c9e?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0OTAwNH0",
         allURLs: {
@@ -33,8 +34,10 @@ const store = new Vuex.Store({
         description: "silver tabby cat on green textile",
         photog: "https://unsplash.com/photos/fYPCG1xUhRs",
         list: "cute cats",
+        display: false,
       },
       {
+        id: 1,
         smallURL:
           "https://images.unsplash.com/photo-1570476440787-ea8aa393ed0a?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0OTAwNH0",
         allURLs: {
@@ -52,8 +55,10 @@ const store = new Vuex.Store({
         description: "white kitten in basket",
         photog: "https://unsplash.com/photos/ya_8wMWZEEc",
         list: "very cute cats",
+        display: false,
       },
       {
+        id: 2,
         smallURL:
           "https://images.unsplash.com/photo-1587989657587-4beb321b4098?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0OTAwNH0",
         allURLs: {
@@ -71,17 +76,22 @@ const store = new Vuex.Store({
         description: "orange and white cat on brown brick wall",
         photog: "https://unsplash.com/photos/vK8n1jvnwS8",
         list: "cats",
+        display: false,
       },
     ],
+    searchView: true
   },
   mutations: {
+    toggleView: (state) =>{
+      state.searchView = !state.searchView
+    },
     updatePhotoList: (state, unsplashList) => {
       state.photoList = [];
       let id = 0;
       for (let el of unsplashList) {
         //used to display only one alt text at a time.
         el.display = false;
-        el.divID = id.toString();
+        el.divID = id;
         state.photoList.push(el);
         id++;
       }
@@ -98,8 +108,24 @@ const store = new Vuex.Store({
         description: desc || el.alt_description,
         photog: el.links.html,
         list: list,
+        display: false,
+        id: state.bookmarkList.length,
       };
       state.bookmarkList.push(favoriteObject);
+    },
+    editBookmarkList: (state, payload) => {
+      let { el, desc, list } = payload;
+      console.log(desc, list);
+      if (desc) {
+        el.description = desc;
+      }
+      el.list = list;
+      for (let bookmark in state.bookmarkList) {
+        if (bookmark.id === el.id) {
+          bookmark = el;
+        }
+      }
+      console.log(state.bookmarkList);
     },
     savePhoto: (state, photo) => {
       state.savePhoto = photo;

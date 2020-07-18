@@ -1,18 +1,28 @@
 <template>
   <div id="app">
-  <SearchPage/>
+    <Header />
+    <div v-if="this.$store.state.searchView">
+      <SearchPage />
+    </div>
+    <div v-else>
+      <FavoritesPage />
+    </div>
   </div>
 </template>
 
 <script>
-import SearchPage from './components/SearchPage.vue'
+import SearchPage from "./components/SearchPage.vue";
+import FavoritesPage from "./components/FavoritesPage.vue";
+import Header from "./components/Header.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    SearchPage
-  }
-}
+    SearchPage,
+    FavoritesPage,
+    Header,
+  },
+};
 </script>
 
 <style>

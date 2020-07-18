@@ -12,18 +12,17 @@
     <div v-if="this.displayFlag">
       <div v-for="el in this.$store.state.photoList" :key="el.id">
         <!-- Div controls what is shown, need to use overMouse(el) method to make sure popover remains -->
-        <div v-on:mouseover="overMouse(el)">
+        <div v-on:mouseover="overMouse(el)" class="imgCell">
           <div v-if="el.display">
-            <h2>{{ el.alt_description }}</h2>
-            <button :id="el.divID" >
+            <button :id="el.divID.toString()">
               Bookmark Photo
             </button>
             <button v-on:click="downloadPhoto(el)">download</button>
             <!-- Popover is used to bookmark photos -->
             <!-- <div>Need to refactor below, I dont know how robust show:sync is -->
             <b-popover
-              :show.sync="displayPopover[el.divID]"
-              :target="el.divID"
+              :show.sync="displayPopover[el.divID.toString()]"
+              :target="el.divID.toString()"
               placement="bottom"
               title="Bookmark Your Photo"
             >
@@ -53,7 +52,7 @@
               <button>Cancel!</button>
             </b-popover>
           </div>
-          <img :src="el.urls.small" />
+          <img :src="el.urls.small" class="singleImage" />
           <div v-if="el.display">
             <h2>{{ el.user.links.html }}</h2>
           </div>
@@ -78,17 +77,17 @@ export default {
       displayPopover: [false],
       description: "",
       newList: "",
-      selectList: ""
+      selectList: "",
     };
   },
   methods: {
     bookmarkPhoto(el, desc, list) {
-      console.log(desc,list)
+      console.log(desc, list);
       let payload = {
         el: el,
         desc: desc,
         list: list,
-      }
+      };
       this.$store.commit("updateBookmarkList", payload);
       console.log(this.$store.state.bookmarkList);
     },
@@ -132,4 +131,21 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.imgCell {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 500px;
+  margin-top: 20px;
+  outline: 1px solid teal;
+  outline-offset: 3 px;
+  width: 650px;
+}
+.singleImage {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+</style>
