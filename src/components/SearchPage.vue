@@ -1,21 +1,25 @@
 <template>
   <div>
     <p>Hello World</p>
+    <!-- Search Bar -->
     <input
       v-model="query"
       v-on:keyup.enter="searchUnsplash"
       placeholder="Search for Cats here"
     />
+
+    <!-- Display list of 10 photos returned from search -->
     <div v-if="this.displayFlag">
       <div v-for="el in this.$store.state.photoList" :key="el.id">
-        <div 
-          v-on:mouseover="overMouse(el)" >
+        <!-- Div controls what is shown, need to use overMouse(el) method to make sure popover remains -->
+        <div v-on:mouseover="overMouse(el)">
           <div v-if="el.display">
             <h2>{{ el.alt_description }}</h2>
-            <button :id="el.divID" v-on:click="bookmarkPhoto(el)">
+            <button :id="el.divID" >
               Bookmark Photo
             </button>
             <button v-on:click="downloadPhoto(el)">download</button>
+            <!-- Popover is used to bookmark photos -->
             <!-- <div>Need to refactor below, I dont know how robust show:sync is -->
             <b-popover
               :show.sync="displayPopover[el.divID]"
@@ -24,8 +28,28 @@
               title="Bookmark Your Photo"
             >
               <h1>List:</h1>
-              New List: <input /> Description:<input />
-              <button>Bookmark!</button>
+              <!-- Vue didn't like doing a nested v-for loop with two Vuex objects. Not sure why, but setting
+              'listArray' equal to this.$store.state.listList is a workaround. Need to investigate. -->
+              <select v-model="selectList">
+                <option disabled value="">Please select one</option>
+                <option v-for="listItem in listArray" :key="listItem.id">
+                  {{ listItem }}
+                </option>
+              </select>
+              New List:
+              <input
+                v-model="newList"
+                v-on:keyup.enter="updatelistList"
+                placeholder="Make New List"
+              />
+              Description:<input
+                v-model="description"
+                placeholder="Describe the Image"
+              />
+
+              <button v-on:click="bookmarkPhoto(el, description, selectList)">
+                Bookmark!
+              </button>
               <button>Cancel!</button>
             </b-popover>
           </div>
@@ -50,10 +74,30 @@ export default {
       query: "",
       displayFlag: false,
       photoList: [],
+      listArray: this.$store.state.listList,
       displayPopover: [false],
+      description: "",
+      newList: "",
+      selectList: ""
     };
   },
   methods: {
+    bookmarkPhoto(el, desc, list) {
+      console.log(desc,list)
+      let payload = {
+        el: el,
+        desc: desc,
+        list: list,
+      }
+      this.$store.commit("updateBookmarkList", payload);
+      console.log(this.$store.state.bookmarkList);
+    },
+    updatelistList(val) {
+      console.log(val.target.value);
+      if (!this.listArray.includes(val.target.value)) {
+        this.$store.commit("updatelistList", val.target.value);
+      }
+    },
     async downloadPhoto(el) {
       console.log(el);
       let response = await axios.get(`${el.urls.raw}`, {
@@ -69,24 +113,17 @@ export default {
 
       fileLink.click();
     },
-    test(query) {
-      console.log(query);
-    },
     overMouse(el) {
       el.display = true;
-      for(let item of this.$store.state.photoList)
-        if(el !== item) {
-          item.display = false
+      for (let item of this.$store.state.photoList)
+        if (el !== item) {
+          item.display = false;
         }
-    },
-    bookmarkPhoto(el) {
-      console.log(el);
     },
     async searchUnsplash(query) {
       let response = await axios.get(
         `https://api.unsplash.com/photos/random?query=${query.target.value}&client_id=${process.env.VUE_APP_ACCESS_KEY}&count=10`
       );
-      // console.log(response)
       this.$store.commit("updatePhotoList", response.data);
       console.log(response.data.display);
       this.displayFlag = true;
