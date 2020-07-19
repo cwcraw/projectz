@@ -118,13 +118,11 @@ export default {
 
       for (let item of this.$store.state.photoList) {
         if (el !== item) {
-          console.log('test')
           item.display = false;
         }
       }
     },
     leaveMouse() {
-      console.log("leaving");
       if (this.throttler) return;
       this.throttler = true;
 
