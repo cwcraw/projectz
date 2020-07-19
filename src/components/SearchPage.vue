@@ -9,13 +9,13 @@
 
     <!-- Display list of 20 photos returned from search -->
     <div v-if="this.displayFlag">
-      <div
-        v-for="el in this.$store.state.photoList"
-        :key="el.id"
-        class="imgCell"
-      >
+      <div v-for="el in this.$store.state.photoList" :key="el.id">
         <!-- Div below controls if extra information is shown. Need to use overMouse(el) method to make sure popover remains -->
-        <div v-on:mouseover="overMouse(el)" v-on:mouseleave="leaveMouse">
+        <div
+          v-on:mouseover="overMouse(el)"
+          v-on:mouseleave="leaveMouse"
+          class="imgCell"
+        >
           <div v-if="el.display" class="topDisplay">
             <button :id="el.divID.toString()">
               Bookmark Photo
@@ -78,7 +78,6 @@ export default {
     return {
       query: "",
       displayFlag: false,
-      photoList: [],
       listArray: this.$store.state.listList,
       displayPopover: [false],
       description: "",
@@ -89,27 +88,22 @@ export default {
   },
   methods: {
     bookmarkPhoto(el, desc, list) {
-      console.log(desc, list);
       let payload = {
         el: el,
         desc: desc,
         list: list,
       };
       this.$store.commit("updateBookmarkList", payload);
-      console.log(this.$store.state.bookmarkList);
     },
     updatelistList(val) {
-      console.log(val.target.value);
       if (!this.listArray.includes(val.target.value)) {
         this.$store.commit("updatelistList", val.target.value);
       }
     },
     async downloadPhoto(el) {
-      console.log(el);
       let response = await axios.get(`${el.urls.raw}`, {
         responseType: "blob",
       });
-      console.log(response.data);
       let fileURL = window.URL.createObjectURL(new Blob([response.data]));
       let fileLink = document.createElement("a");
 
@@ -121,12 +115,16 @@ export default {
     },
     overMouse(el) {
       el.display = true;
-      for (let item of this.$store.state.photoList)
+
+      for (let item of this.$store.state.photoList) {
         if (el !== item) {
+          console.log('test')
           item.display = false;
         }
+      }
     },
     leaveMouse() {
+      console.log("leaving");
       if (this.throttler) return;
       this.throttler = true;
 
@@ -135,10 +133,9 @@ export default {
     },
     async searchUnsplash(query) {
       let response = await axios.get(
-        `https://api.unsplash.com/photos/random?query=${query.target.value}&client_id=${process.env.VUE_APP_ACCESS_KEY}&count=20`
+        `https://api.unsplash.com/photos/random?query=${query.target.value}&client_id=${process.env.VUE_APP_ACCESS_KEY}&count=10`
       );
       this.$store.commit("updatePhotoList", response.data);
-      console.log(response.data.display);
       this.displayFlag = true;
     },
   },

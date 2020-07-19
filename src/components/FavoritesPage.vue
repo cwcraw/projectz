@@ -92,10 +92,11 @@ export default {
     },
     overMouse(el) {
       el.display = true;
+
       for (let item of this.$store.state.bookmarkList) {
         if (el.smallURL !== item.smallURL) {
           item.display = false;
-        }
+        } 
       }
     },
     leaveMouse() {

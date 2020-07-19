@@ -12,6 +12,7 @@ Vue.use(IconsPlugin);
 //Using Vuex to store states used across the two pages. Also, the bookmarks and lists will be stored in the DB in the future.
 const store = new Vuex.Store({
   state: {
+    photoList: [],
     listList: ["Cats", "Cute Cats", "Very Cute Cats",'Miscellany'],
     bookmarkList: [
       {
@@ -100,7 +101,6 @@ const store = new Vuex.Store({
     },
     updateBookmarkList: (state, payload) => {
       let { el, desc, list } = payload;
-      console.log(list)
       // The '||' statements are used to manage if a user doesn't input a value.
       let favoriteObject = {
         smallURL: el.urls.small,
@@ -111,12 +111,10 @@ const store = new Vuex.Store({
         display: false,
         id: state.bookmarkList.length,
       };
-      console.log(favoriteObject)
       state.bookmarkList.push(favoriteObject);
     },
     editBookmarkList: (state, payload) => {
       let { el, desc, list } = payload;
-      console.log(desc, list);
       if (desc) {
         el.description = desc;
       }
