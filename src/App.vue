@@ -1,11 +1,12 @@
 <template>
   <div id="app">
-    <Header />
+    <Header id = "header"/>
+
     <div v-if="this.$store.state.searchView">
-      <SearchPage />
+      <SearchPage id='search'/>
     </div>
     <div v-else>
-      <FavoritesPage />
+      <FavoritesPage id='favorite'/>
     </div>
   </div>
 </template>
@@ -33,5 +34,8 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+#header {
+  padding: 10px
 }
 </style>

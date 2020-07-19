@@ -1,61 +1,67 @@
 <template>
   <div>
-    <p>Hello World</p>
     <!-- Search Bar -->
     <input
       v-model="query"
       v-on:keyup.enter="searchUnsplash"
-      placeholder="Search for Cats here"
+      placeholder="Search for cats here"
     />
 
-    <!-- Display list of 10 photos returned from search -->
+    <!-- Display list of 20 photos returned from search -->
     <div v-if="this.displayFlag">
-      <div v-for="el in this.$store.state.photoList" :key="el.id">
-        <!-- Div controls what is shown, need to use overMouse(el) method to make sure popover remains -->
-        <div v-on:mouseover="overMouse(el)" class="imgCell">
-          <div v-if="el.display">
+      <div
+        v-for="el in this.$store.state.photoList"
+        :key="el.id"
+        class="imgCell"
+      >
+        <!-- Div below controls if extra information is shown. Need to use overMouse(el) method to make sure popover remains -->
+        <div v-on:mouseover="overMouse(el)" v-on:mouseleave="leaveMouse">
+          <div v-if="el.display" class="topDisplay">
             <button :id="el.divID.toString()">
               Bookmark Photo
             </button>
-            <button v-on:click="downloadPhoto(el)">download</button>
+            <button v-on:click="downloadPhoto(el)">Download</button>
             <!-- Popover is used to bookmark photos -->
-            <!-- <div>Need to refactor below, I dont know how robust show:sync is -->
+            <!-- Need to refactor below, I dont know how robust show:sync is -->
             <b-popover
               :show.sync="displayPopover[el.divID.toString()]"
               :target="el.divID.toString()"
               placement="bottom"
               title="Bookmark Your Photo"
             >
-              <h1>List:</h1>
               <!-- Vue didn't like doing a nested v-for loop with two Vuex objects. Not sure why, but setting
               'listArray' equal to this.$store.state.listList is a workaround. Need to investigate. -->
               <select v-model="selectList">
-                <option disabled value="">Please select one</option>
+                <option disabled value="">Please select a category</option>
                 <option v-for="listItem in listArray" :key="listItem.id">
                   {{ listItem }}
                 </option>
               </select>
-              New List:
+
+              <h6>New category:</h6>
               <input
                 v-model="newList"
                 v-on:keyup.enter="updatelistList"
-                placeholder="Make New List"
+                placeholder="Make a new Category"
               />
-              Description:<input
-                v-model="description"
-                placeholder="Describe the Image"
-              />
+              <h6>Description:</h6>
+              <input v-model="description" placeholder="Describe the image" />
+              <br />
 
               <button v-on:click="bookmarkPhoto(el, description, selectList)">
-                Bookmark!
+                Bookmark
               </button>
-              <button>Cancel!</button>
+              <button v-on:click="displayPopover = [false]">Cancel</button>
             </b-popover>
           </div>
+          <div v-else class="topDisplay"></div>
           <img :src="el.urls.small" class="singleImage" />
-          <div v-if="el.display">
-            <h2>{{ el.user.links.html }}</h2>
+          <div v-if="el.display" class="bottomDisplay">
+            <a :href="el.user.links.html">
+              Visit the Photographer's page for more cats!
+            </a>
           </div>
+          <div v-else class="bottomDisplay"></div>
         </div>
       </div>
     </div>
@@ -78,6 +84,7 @@ export default {
       description: "",
       newList: "",
       selectList: "",
+      throttler: false,
     };
   },
   methods: {
@@ -119,9 +126,16 @@ export default {
           item.display = false;
         }
     },
+    leaveMouse() {
+      if (this.throttler) return;
+      this.throttler = true;
+
+      for (let item of this.$store.state.photoList) item.display = false;
+      setTimeout(() => (this.throttler = false), 1);
+    },
     async searchUnsplash(query) {
       let response = await axios.get(
-        `https://api.unsplash.com/photos/random?query=${query.target.value}&client_id=${process.env.VUE_APP_ACCESS_KEY}&count=10`
+        `https://api.unsplash.com/photos/random?query=${query.target.value}&client_id=${process.env.VUE_APP_ACCESS_KEY}&count=20`
       );
       this.$store.commit("updatePhotoList", response.data);
       console.log(response.data.display);
@@ -133,14 +147,18 @@ export default {
 
 <style scoped>
 .imgCell {
-  display: block;
   margin-left: auto;
   margin-right: auto;
-  min-height: 500px;
   margin-top: 20px;
   outline: 1px solid teal;
   outline-offset: 3 px;
   width: 650px;
+}
+.topDisplay {
+  min-height: 70px;
+}
+.bottomDisplay {
+  min-height: 70px;
 }
 .singleImage {
   display: inline-flex;

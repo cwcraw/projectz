@@ -9,11 +9,10 @@ Vue.use(Vuex);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
+//Using Vuex to store states used across the two pages. Also, the bookmarks and lists will be stored in the DB in the future.
 const store = new Vuex.Store({
   state: {
-    photoList: [],
-    savePhoto: [], // do I need this?
-    listList: ["cats", "cute cats", "very cute cats"],
+    listList: ["Cats", "Cute Cats", "Very Cute Cats",'Miscellany'],
     bookmarkList: [
       {
         id: 0,
@@ -32,8 +31,8 @@ const store = new Vuex.Store({
             "https://images.unsplash.com/photo-1591369631806-e6473e109c9e?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjE0OTAwNH0",
         },
         description: "silver tabby cat on green textile",
-        photog: "https://unsplash.com/photos/fYPCG1xUhRs",
-        list: "cute cats",
+        photog: "https://unsplash.com/@maverick18",
+        list: "Cute Cats",
         display: false,
       },
       {
@@ -53,8 +52,8 @@ const store = new Vuex.Store({
             "https://images.unsplash.com/photo-1570476440787-ea8aa393ed0a?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjE0OTAwNH0",
         },
         description: "white kitten in basket",
-        photog: "https://unsplash.com/photos/ya_8wMWZEEc",
-        list: "very cute cats",
+        photog: "https://unsplash.com/@chiabra",
+        list: "Very Cute Cats",
         display: false,
       },
       {
@@ -74,8 +73,8 @@ const store = new Vuex.Store({
             "https://images.unsplash.com/photo-1587989657587-4beb321b4098?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjE0OTAwNH0",
         },
         description: "orange and white cat on brown brick wall",
-        photog: "https://unsplash.com/photos/vK8n1jvnwS8",
-        list: "cats",
+        photog: "https://unsplash.com/@thebucler",
+        list: "Cats",
         display: false,
       },
     ],
@@ -101,16 +100,18 @@ const store = new Vuex.Store({
     },
     updateBookmarkList: (state, payload) => {
       let { el, desc, list } = payload;
-      console.log(desc, list);
+      console.log(list)
+      // The '||' statements are used to manage if a user doesn't input a value.
       let favoriteObject = {
         smallURL: el.urls.small,
         allURLs: el.urls,
         description: desc || el.alt_description,
-        photog: el.links.html,
-        list: list,
+        photog: el.user.links.html,
+        list: list || 'Miscellany',
         display: false,
         id: state.bookmarkList.length,
       };
+      console.log(favoriteObject)
       state.bookmarkList.push(favoriteObject);
     },
     editBookmarkList: (state, payload) => {
@@ -125,10 +126,6 @@ const store = new Vuex.Store({
           bookmark = el;
         }
       }
-      console.log(state.bookmarkList);
-    },
-    savePhoto: (state, photo) => {
-      state.savePhoto = photo;
     },
   },
 });
