@@ -1,7 +1,6 @@
 
 module.exports = knex => {
     return async params => {
-      console.log(params);
       const start_date = params.start_date;
       const due_date = params.due_date;
       const finished = params.finished;

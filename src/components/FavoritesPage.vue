@@ -81,14 +81,12 @@ export default {
   },
   methods: {
     editBookmark(el, desc, list) {
-      console.log(el, desc, list);
       let payload = {
         el: el,
         desc: desc,
         list: list,
       };
       this.$store.commit("editBookmarkList", payload);
-      console.log(this.$store.state.bookmarkList);
     },
     overMouse(el) {
       el.display = true;
@@ -106,9 +104,7 @@ export default {
       for (let item of this.$store.state.bookmarkList) item.display = false;
       setTimeout(() => (this.throttler = false), 1);
     },
-    updatelistList(val) {
-      console.log(val.target.value);
-      if (!this.listArray.includes(val.target.value)) {
+    updatelistList(val) {      if (!this.listArray.includes(val.target.value)) {
         this.$store.commit("updatelistList", val.target.value);
       }
     },

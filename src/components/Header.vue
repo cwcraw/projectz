@@ -15,7 +15,6 @@ export default {
   name: "Header",
   methods: {
     toggleView: function() {
-      console.log("toggling");
       this.$store.commit("toggleView");
     },
     topFunction: function() {
